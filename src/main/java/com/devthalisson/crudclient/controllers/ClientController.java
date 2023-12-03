@@ -1,5 +1,6 @@
 package com.devthalisson.crudclient.controllers;
 
+import com.devthalisson.crudclient.dto.ClientDTO;
 import com.devthalisson.crudclient.entities.Client;
 import com.devthalisson.crudclient.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class ClientController {
     private ClientService service;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Client> findById(@PathVariable Long id){
-        Client result = service.findById(id);
+    public ResponseEntity<ClientDTO> findById(@PathVariable Long id){
+        ClientDTO result = service.findById(id);
         return ResponseEntity.status(200).body(result);
     }
 }
