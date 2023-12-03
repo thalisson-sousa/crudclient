@@ -27,4 +27,11 @@ public class ClientService {
         Page<Client> result = repository.findAll(pageable);
         return result.map(x -> new ClientDTO(x));
     }
+
+    @Transactional
+    public ClientDTO insert(ClientDTO dto) {
+        Client entity = new Client(dto.getName(), dto.getCpf(), dto.getIncome(), dto.getBirthDate(), dto.getChildren());
+        entity = repository.save(entity);
+        return new  ClientDTO(entity);
+    }
 }
