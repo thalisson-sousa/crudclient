@@ -3,6 +3,8 @@ package com.devthalisson.crudclient.services;
 import com.devthalisson.crudclient.dto.ClientDTO;
 import com.devthalisson.crudclient.entities.Client;
 import com.devthalisson.crudclient.repositories.ClientRepository;
+import com.devthalisson.crudclient.services.exceptions.IdNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +20,7 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public ClientDTO findById(Long id) {
-        Client entity = repository.findById(id).get();
+        Client entity = repository.findById(id).orElseThrow(() -> new IdNotFoundException("ID não encontrado"));
         ClientDTO client = new ClientDTO(entity);
         return client;
     }
@@ -38,14 +40,22 @@ public class ClientService {
 
     @Transactional
     public ClientDTO update(Long id, ClientDTO dto) {
-        Client entity = repository.getReferenceById(id);
-        copyDtToEntity(dto, entity);
-        entity = repository.save(entity);
-        return new ClientDTO(entity);
+        try {
+            Client entity = repository.getReferenceById(id);
+            copyDtToEntity(dto, entity);
+            entity = repository.save(entity);
+            return new ClientDTO(entity);
+        }
+        catch (EntityNotFoundException e) {
+            throw new IdNotFoundException("ID não encontrado");
+        }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new IdNotFoundException("ID não encontrado");
+        }
         repository.deleteById(id);
     }
 
